@@ -5,6 +5,11 @@
     "require": {
         "doctrine/orm": "^2.6"
     },
+    "autoload": {
+        "psr-0": {
+            "ApiGenerator": "src/"
+        }
+    },
     "license": "dev",
     "authors": [
         {

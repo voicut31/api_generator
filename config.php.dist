@@ -1,0 +1,9 @@
+<?php
+
+$config['database'] = array(
+    'driver'   => 'pdo_mysql',
+    'host'     => '127.0.0.1',
+    'dbname'   => 'api_generator',
+    'user'     => 'root',
+    'password' => ''
+);
