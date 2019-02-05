@@ -44,13 +44,16 @@ class Api
         } elseif ($this->requestMethod === 'GET') {
             $data = $this->schema->getResults($module);
         } elseif ($this->requestMethod === 'OPTIONS') {
-
+            return $this->sendOptionHeaders();
         } elseif ($this->requestMethod === 'POST') {
             $this->schema->insert($module, $params);
+            $data = ['message' => 'ok'];
         } elseif ($this->requestMethod === 'PUT') {
             $this->schema->update($module, $id, $params);
+            $data = ['message' => 'ok'];
         } elseif ($this->requestMethod === 'DELETE') {
-            $this->schema->update($module, $delete);
+            $this->schema->delete($module, $id);
+            return $this->sendDeleteHeaders();
         }
 
         $this->sendJsonResponse($data);
@@ -60,6 +63,17 @@ class Api
     {
         header('Content-Type: application/json');
         echo json_encode($data);
+    }
+
+    private function sendOptionHeaders()
+    {
+        header('Access-Control-Allow-Headers: content-type, authorization, x-total-count');
+        header('Access-Control-Allow-Methods: GET, OPTIONS, POST, PUT, PATCH, DELETE');
+    }
+
+    private function sendDeleteHeaders()
+    {
+        header('Content-Type: application/json');
     }
 
 }

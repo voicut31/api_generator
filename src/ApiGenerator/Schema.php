@@ -52,25 +52,31 @@ class Schema
 
     public function insert($module, $params)
     {
-        return $this->conn
+        $keys = [];
+        foreach($params as $i => $v) {
+            $keys[$i] = '?';
+        }
+
+        $query = $this->conn
             ->createQueryBuilder()
             ->insert($module)
-            ->values($params)
-            ->execute();
+            ->values($keys);
+            $query->setParameters(array_values($params));
+
+        return $query->execute();
     }
 
     public function update($module, $id, $params)
     {
-        $setQuery = '';
-        foreach ($params as $i => $v) {
-            $setQuery = $setQuery !== '' ? ', ' . $i . '=' . $v : $i . '=' . $v;
-        }
+        $queryBuilder = $this->conn->createQueryBuilder();
 
-        return $this->conn
-            ->createQueryBuilder()
-            ->update($module)
-            ->set($setQuery)
-            ->where('id = :id')
+        $query = $queryBuilder
+            ->update($module);
+            foreach ($params as $i => $v) {
+                $query->set($i, $queryBuilder->expr()->literal($v));
+            }
+
+            return $query->where('id = :id')
             ->setParameter(':id', $id)
             ->execute();
     }

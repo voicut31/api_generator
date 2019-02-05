@@ -9,7 +9,7 @@ $configuration = new \Doctrine\DBAL\Configuration();
 
 $conn = \Doctrine\DBAL\DriverManager::getConnection($config['database'], $configuration);
 
-$uri = $_SERVER['REQUEST_URI'];
+$uri = $_SERVER['PATH_INFO'];
 $parts = explode('/', $uri);
 if ($parts[1] !== 'api') {
     throw new Error('The path is not a valid api request!');

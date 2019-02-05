@@ -9,8 +9,16 @@ composer install
 ## Usage
 
 ```
-$generator = new ApiGenerator\Generator($conn);
-$generator->generate();
+...
+use ApiGenerator\Generator;
+$configuration = new \Doctrine\DBAL\Configuration();
+$conn = \Doctrine\DBAL\DriverManager::getConnection($config['database'], $configuration);
+
+...
+
+$generator = new Generator($conn);
+$generator->api($module, $id, $params);
+
 ```
 
 ### Available request methods
