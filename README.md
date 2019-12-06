@@ -4,7 +4,20 @@ It's generate api endpoints based on database tables
 
 ## Install
 
+### Install composer 
+
+```
+brew install composer
+```
+
+### Install packages
+```
 composer install
+```
+
+## Configure the aplication
+
+
 
 ## Usage
 
