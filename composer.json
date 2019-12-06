@@ -10,7 +10,7 @@
             "ApiGenerator": "src/"
         }
     },
-    "license": "dev",
+    "license": "MIT",
     "authors": [
         {
             "name": "Voicu Tibea",
