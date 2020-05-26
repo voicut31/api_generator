@@ -36,5 +36,5 @@ $generator->api($module, $id, $params);
 
 ### Available request methods
 
-'GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'
+'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'
 

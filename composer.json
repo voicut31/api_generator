@@ -16,5 +16,8 @@
             "name": "Voicu Tibea",
             "email": "voicut31@yahoo.com"
         }
-    ]
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "8.*"
+    }
 }

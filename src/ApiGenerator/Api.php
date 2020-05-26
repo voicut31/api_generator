@@ -8,6 +8,9 @@
 
 namespace ApiGenerator;
 
+use Error;
+use Schema;
+
 class Api
 {
     const TYPE_INTEGER = 'Integer';
@@ -19,41 +22,51 @@ class Api
 
     private $apiStructure;
 
-    const AVAILABLE_REQUEST_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'];
+    public const AVAILABLE_REQUEST_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
 
     private $requestMethod;
 
-    public function __construct($schema, $apiStructure)
+    public function __construct(Schema $schema, $apiStructure)
     {
         $this->schema = $schema;
         $this->apiStructure = $apiStructure;
         $this->requestMethod = $_SERVER['REQUEST_METHOD'];
         if (!in_array($this->requestMethod, self::AVAILABLE_REQUEST_METHODS)){
-            throw new \Error('Method not available');
+            throw new Error('Method not available');
         }
     }
 
     public function response($module, $id, $params)
     {
         if ($module !== null && !isset($this->apiStructure[$module])){
-            throw new \Error('No module available in the api');
+            throw new Error('No module available in the api');
         }
 
-        if ($this->requestMethod === 'GET' && $id !== null) {
-            $data = $this->schema->getResult($module, $id);
-        } elseif ($this->requestMethod === 'GET') {
-            $data = $this->schema->getResults($module);
-        } elseif ($this->requestMethod === 'OPTIONS') {
-            return $this->sendOptionHeaders();
-        } elseif ($this->requestMethod === 'POST') {
-            $this->schema->insert($module, $params);
-            $data = ['message' => 'ok'];
-        } elseif ($this->requestMethod === 'PUT') {
-            $this->schema->update($module, $id, $params);
-            $data = ['message' => 'ok'];
-        } elseif ($this->requestMethod === 'DELETE') {
-            $this->schema->delete($module, $id);
-            return $this->sendDeleteHeaders();
+        switch ($this->requestMethod){
+            case 'GET' && $id !== null:
+                $data = $this->schema->getResult($module, $id);
+                break;
+            case 'GET':
+                $data = $this->schema->getResults($module);
+                break;
+            case 'OPTIONS':
+                return $this->sendOptionHeaders();
+                break;
+            case 'POST':
+                $this->schema->insert($module, $params);
+                $data = ['message' => 'ok'];
+                break;
+            case 'PUT':
+            case 'PATCH':
+                $this->schema->update($module, $id, $params);
+                $data = ['message' => 'ok'];
+                break;
+            case 'DELETE':
+                $this->schema->delete($module, $id);
+                return $this->sendDeleteHeaders();
+                break;
+            default:
+                break;
         }
 
         $this->sendJsonResponse($data);
@@ -75,5 +88,4 @@ class Api
     {
         header('Content-Type: application/json');
     }
-
 }

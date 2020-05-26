@@ -1,9 +1,15 @@
 <?php
 
-$config['database'] = array(
-    'driver'   => 'pdo_mysql',
-    'host'     => '127.0.0.1',
-    'dbname'   => 'api_generator',
-    'user'     => 'root',
-    'password' => ''
-);
+$config = [
+    'database' => [
+        'driver'   => 'pdo_mysql',
+        'host'     => '127.0.0.1',
+        'dbname'   => 'api_generator',
+        'user'     => 'root',
+        'password' => ''
+    ],
+    'exclude' => [
+        'schema' => [],
+        'columns' => []
+    ]
+];
