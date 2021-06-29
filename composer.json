@@ -1,6 +1,7 @@
 {
     "name": "voicut31/api_generator",
     "description": "API Generator",
+    "version": "0.2.0",
     "type": "library",
     "require": {
         "doctrine/orm": "^2.6"

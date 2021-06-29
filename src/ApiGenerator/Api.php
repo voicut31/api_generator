@@ -42,6 +42,7 @@ class Api
             throw new Error('No module available in the api');
         }
 
+        $this->sendGeneralHeaders();
         switch ($this->requestMethod){
             case 'GET' && $id !== null:
                 $data = $this->schema->getResult($module, $id);
@@ -76,6 +77,13 @@ class Api
     {
         header('Content-Type: application/json');
         echo json_encode($data);
+    }
+
+    private function sendGeneralHeaders()
+    {
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
+        header("Access-Control-Allow-Headers: X-Requested-With");
     }
 
     private function sendOptionHeaders()
