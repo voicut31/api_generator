@@ -8,11 +8,21 @@
 
 namespace ApiGenerator;
 
+/**
+ * Class Generator
+ * @package ApiGenerator
+ */
 class Generator
 {
-    private $schema;
+    /**
+     * @var Schema
+     */
+    private Schema $schema;
 
-    private $apiStructure = [];
+    /**
+     * @var array
+     */
+    private array $apiStructure = [];
 
     /**
      * Generator constructor.

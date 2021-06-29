@@ -8,37 +8,81 @@
 
 namespace ApiGenerator;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\ForwardCompatibility\DriverStatement;
+use Doctrine\DBAL\Schema\Column;
 
+/**
+ * Class Schema
+ * @package ApiGenerator
+ */
 class Schema
 {
-    private $conn;
+    /**
+     * @var Connection
+     */
+    private Connection $conn;
 
-    public function __construct($conn)
+    /**
+     * Schema constructor.
+     *
+     * @param Connection $conn
+     */
+    public function __construct(Connection $conn)
     {
         $this->conn = $conn;
     }
 
-    public function getTables()
+    /**
+     * Get tables
+     *
+     * @return string[]
+     */
+    public function getTables(): array
     {
         return $this->conn->getSchemaManager()->listTableNames();
     }
 
-    public function getTableColumns($table)
+    /**
+     * Get table columns
+     *
+     * @param $table
+     * @return Column[]
+     */
+    public function getTableColumns($table): array
     {
         return $this->conn->getSchemaManager()->listTableColumns($table);
     }
 
-    public function getResults($module)
+    /**
+     * Get the results
+     *
+     * @param $module
+     * @return array
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    public function getResults($module): array
     {
         return $this->conn
             ->createQueryBuilder()
             ->select('*')
             ->from($module)
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
     }
 
-    public function getResult($module, $id)
+    /**
+     * Get the result based on id
+     *
+     * @param $module
+     * @param $id
+     * @return array[]
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    public function getResult($module, $id):array
     {
         return $this->conn
             ->createQueryBuilder()
@@ -47,9 +91,17 @@ class Schema
             ->where('id = :id')
             ->setParameter(':id', $id)
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
     }
 
+    /**
+     * Insert a new record
+     *
+     * @param $module
+     * @param $params
+     * @return DriverStatement|int
+     * @throws Exception
+     */
     public function insert($module, $params)
     {
         $keys = [];
@@ -61,27 +113,45 @@ class Schema
             ->createQueryBuilder()
             ->insert($module)
             ->values($keys);
-            $query->setParameters(array_values($params));
+        $query->setParameters(array_values($params));
 
         return $query->execute();
     }
 
-    public function update($module, $id, $params)
+    /**
+     * Update a record
+     *
+     * @param $module
+     * @param $id
+     * @param $params
+     * @return mixed
+     * @throws Exception
+     */
+    public function update($module, $id, $params): array
     {
         $queryBuilder = $this->conn->createQueryBuilder();
 
         $query = $queryBuilder
             ->update($module);
-            foreach ($params as $i => $v) {
-                $query->set($i, $queryBuilder->expr()->literal($v));
-            }
+        foreach ($params as $i => $v) {
+            $query->set($i, $queryBuilder->expr()->literal($v));
+        }
 
-            return $query->where('id = :id')
-            ->setParameter(':id', $id)
-            ->execute();
+        $q = $query->where('id = :id')
+            ->setParameter(':id', (int)$id);
+
+        return $q->execute();
     }
 
-    public function delete($module, $id)
+    /**
+     * Delete a record
+     *
+     * @param $module
+     * @param $id
+     * @return mixed
+     * @throws Exception
+     */
+    public function delete($module, $id): array
     {
         return $this->conn
             ->createQueryBuilder()

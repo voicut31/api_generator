@@ -9,24 +9,43 @@
 namespace ApiGenerator;
 
 use Error;
-use Schema;
 
+/**
+ * Class Api
+ * @package ApiGenerator
+ */
 class Api
 {
-    const TYPE_INTEGER = 'Integer';
-    const TYPE_STRING = 'String';
-    const TYPE_TEXT = 'Text';
-    const TYPE_DATE_TIME = 'DateTime';
-
-    private $schema;
-
-    private $apiStructure;
-
+//    const TYPE_INTEGER = 'Integer';
+//    const TYPE_STRING = 'String';
+//    const TYPE_TEXT = 'Text';
+//    const TYPE_DATE_TIME = 'DateTime';
+    /**
+     *
+     */
     public const AVAILABLE_REQUEST_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
 
+    /**
+     * @var Schema
+     */
+    private Schema $schema;
+
+    /**
+     * @var array
+     */
+    private array $apiStructure;
+
+    /**
+     * @var mixed
+     */
     private $requestMethod;
 
-    public function __construct(Schema $schema, $apiStructure)
+    /**
+     * Api constructor.
+     * @param Schema $schema
+     * @param array $apiStructure
+     */
+    public function __construct(Schema $schema, array $apiStructure = [])
     {
         $this->schema = $schema;
         $this->apiStructure = $apiStructure;
@@ -42,6 +61,9 @@ class Api
             throw new Error('No module available in the api');
         }
 
+        $data = [];
+
+        $this->sendGeneralHeaders();
         switch ($this->requestMethod){
             case 'GET' && $id !== null:
                 $data = $this->schema->getResult($module, $id);
@@ -50,7 +72,7 @@ class Api
                 $data = $this->schema->getResults($module);
                 break;
             case 'OPTIONS':
-                return $this->sendOptionHeaders();
+                $this->sendOptionHeaders();
                 break;
             case 'POST':
                 $this->schema->insert($module, $params);
@@ -63,7 +85,7 @@ class Api
                 break;
             case 'DELETE':
                 $this->schema->delete($module, $id);
-                return $this->sendDeleteHeaders();
+                $this->sendDeleteHeaders();
                 break;
             default:
                 break;
@@ -72,19 +94,38 @@ class Api
         $this->sendJsonResponse($data);
     }
 
-    private function sendJsonResponse($data)
+    /**
+     * @param $data
+     */
+    private function sendJsonResponse($data):void
     {
         header('Content-Type: application/json');
         echo json_encode($data);
     }
 
-    private function sendOptionHeaders()
+    /**
+     *
+     */
+    private function sendGeneralHeaders():void
+    {
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
+        header("Access-Control-Allow-Headers: X-Requested-With");
+    }
+
+    /**
+     *
+     */
+    private function sendOptionHeaders():void
     {
         header('Access-Control-Allow-Headers: content-type, authorization, x-total-count');
         header('Access-Control-Allow-Methods: GET, OPTIONS, POST, PUT, PATCH, DELETE');
     }
 
-    private function sendDeleteHeaders()
+    /**
+     *
+     */
+    private function sendDeleteHeaders():void
     {
         header('Content-Type: application/json');
     }

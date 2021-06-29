@@ -4,10 +4,17 @@ require_once __DIR__ . '/vendor/autoload.php';
 require_once 'config.php';
 
 use ApiGenerator\Generator;
+use Doctrine\DBAL\Configuration;
+use Doctrine\DBAL\DriverManager;
 
-$configuration = new \Doctrine\DBAL\Configuration();
-
-$conn = \Doctrine\DBAL\DriverManager::getConnection($config['database'], $configuration);
+try {
+    if (!empty($config)) {
+        $configuration = new Configuration();
+        $conn = DriverManager::getConnection($config['database'], $configuration);
+    }
+} catch (Exception $e) {
+    throw new Exception('Connection to database is down!');
+}
 
 $uri = $_SERVER['PATH_INFO'];
 $parts = explode('/', $uri);
@@ -17,6 +24,13 @@ if ($parts[1] !== 'api') {
 $module = $parts[2] ?? null;
 $id = $parts[3] ?? null;
 $params = $_REQUEST;
+if (in_array($_SERVER['REQUEST_METHOD'], ['PUT', 'PATCH', 'POST'])) {
+    $request_body = file_get_contents('php://input');
+    $params = (array)json_decode($request_body);
+}
 
-$generator = new Generator($conn);
-$generator->api($module, $id, $params);
+if (isset($conn)) {
+    $generator = new Generator($conn);
+    $generator->api($module, $id, $params);
+}
+
