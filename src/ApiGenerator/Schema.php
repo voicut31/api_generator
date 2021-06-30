@@ -124,10 +124,10 @@ class Schema
      * @param $module
      * @param $id
      * @param $params
-     * @return mixed
+     * @return int
      * @throws Exception
      */
-    public function update($module, $id, $params): array
+    public function update($module, $id, $params): int
     {
         $queryBuilder = $this->conn->createQueryBuilder();
 

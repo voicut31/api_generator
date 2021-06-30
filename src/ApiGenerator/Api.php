@@ -55,6 +55,10 @@ class Api
         }
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
     public function response($module, $id, $params)
     {
         if ($module !== null && !isset($this->apiStructure[$module])){
@@ -64,7 +68,14 @@ class Api
         $data = [];
 
         $this->sendGeneralHeaders();
+//        var_dump($this->requestMethod); exit;
         switch ($this->requestMethod){
+            case 'PUT':
+            case 'PATCH':
+//                var_dump($params); exit;
+                $this->schema->update($module, $id, $params);
+                $data = ['message' => 'ok'];
+                break;
             case 'GET' && $id !== null:
                 $data = $this->schema->getResult($module, $id);
                 break;
@@ -76,11 +87,6 @@ class Api
                 break;
             case 'POST':
                 $this->schema->insert($module, $params);
-                $data = ['message' => 'ok'];
-                break;
-            case 'PUT':
-            case 'PATCH':
-                $this->schema->update($module, $id, $params);
                 $data = ['message' => 'ok'];
                 break;
             case 'DELETE':
