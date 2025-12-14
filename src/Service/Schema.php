@@ -1,23 +1,21 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Voicu Tibea
- * Date: 2019-01-21
- * Time: 17:22
- */
 
-namespace ApiGenerator;
+declare(strict_types=1);
 
+namespace ApiGenerator\Service;
+
+use ApiGenerator\Contract\SchemaInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
-use Doctrine\DBAL\ForwardCompatibility\DriverStatement;
 use Doctrine\DBAL\Schema\Column;
 
 /**
  * Class Schema
- * @package ApiGenerator
+ * Handles database schema operations
+ *
+ * @package ApiGenerator\Service
  */
-class Schema
+class Schema implements SchemaInterface
 {
     /**
      * @var Connection
@@ -35,7 +33,7 @@ class Schema
     }
 
     /**
-     * Get tables
+     * Get all tables from the database
      *
      * @return string[]
      */
@@ -45,25 +43,25 @@ class Schema
     }
 
     /**
-     * Get table columns
+     * Get columns for a specific table
      *
-     * @param $table
+     * @param string $table
      * @return Column[]
      */
-    public function getTableColumns($table): array
+    public function getTableColumns(string $table): array
     {
         return $this->conn->getSchemaManager()->listTableColumns($table);
     }
 
     /**
-     * Get the results
+     * Get all results from a module/table
      *
-     * @param $module
+     * @param string $module
      * @return array
      * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */
-    public function getResults($module): array
+    public function getResults(string $module): array
     {
         return $this->conn
             ->createQueryBuilder()
@@ -74,15 +72,15 @@ class Schema
     }
 
     /**
-     * Get the result based on id
+     * Get a single result by ID
      *
-     * @param $module
-     * @param $id
-     * @return array[]
+     * @param string $module
+     * @param int|string $id
+     * @return array
      * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
      */
-    public function getResult($module, $id):array
+    public function getResult(string $module, int|string $id): array
     {
         return $this->conn
             ->createQueryBuilder()
@@ -97,15 +95,15 @@ class Schema
     /**
      * Insert a new record
      *
-     * @param $module
-     * @param $params
-     * @return DriverStatement|int
+     * @param string $module
+     * @param array $params
+     * @return mixed
      * @throws Exception
      */
-    public function insert($module, $params)
+    public function insert(string $module, array $params): mixed
     {
         $keys = [];
-        foreach($params as $i => $v) {
+        foreach ($params as $i => $v) {
             $keys[$i] = '?';
         }
 
@@ -121,18 +119,17 @@ class Schema
     /**
      * Update a record
      *
-     * @param $module
-     * @param $id
-     * @param $params
+     * @param string $module
+     * @param int|string $id
+     * @param array $params
      * @return int
      * @throws Exception
      */
-    public function update($module, $id, $params): int
+    public function update(string $module, int|string $id, array $params): int
     {
         $queryBuilder = $this->conn->createQueryBuilder();
 
-        $query = $queryBuilder
-            ->update($module);
+        $query = $queryBuilder->update($module);
         foreach ($params as $i => $v) {
             $query->set($i, $queryBuilder->expr()->literal($v));
         }
@@ -146,12 +143,12 @@ class Schema
     /**
      * Delete a record
      *
-     * @param $module
-     * @param $id
+     * @param string $module
+     * @param int|string $id
      * @return mixed
      * @throws Exception
      */
-    public function delete($module, $id): array
+    public function delete(string $module, int|string $id): mixed
     {
         return $this->conn
             ->createQueryBuilder()
@@ -161,3 +158,4 @@ class Schema
             ->execute();
     }
 }
+
